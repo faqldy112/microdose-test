@@ -1,0 +1,6 @@
+rootProject.name = 'microdose-test'
+
+gradle.ext {
+    vertxVersion = '3.9.0'
+    guavaVersion = '24.1-jre'
+}

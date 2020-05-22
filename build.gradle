@@ -1,0 +1,19 @@
+group 'com.arktech'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile "com.google.guava:guava:${gradle.guavaVersion}"
+    compile "io.vertx:vertx-unit:${gradle.vertxVersion}"
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
