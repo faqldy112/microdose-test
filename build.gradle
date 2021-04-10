@@ -1,5 +1,5 @@
 group = 'com.arktech'
-version = '1.0.0-SNAPSHOT'
+version = '1.0.1'
 
 def artifactId = 'microdose-test'
 def aliyunUsername = project.hasProperty('username') ? project.property('username') : ''
