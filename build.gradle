@@ -1,19 +1,93 @@
-group 'com.arktech'
-version '1.0.0'
+group = 'com.arktech'
+version = '1.0.0-SNAPSHOT'
+
+def artifactId = 'microdose-test'
+def aliyunUsername = project.hasProperty('username') ? project.property('username') : ''
+def aliyunPassword = project.hasProperty('password') ? project.property('password') : ''
 
 apply plugin: 'java'
 apply plugin: 'maven'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
-repositories {
-    mavenLocal()
-    mavenCentral()
+allprojects {
+    repositories {
+        mavenCentral()
+        maven {
+            url 'https://maven.aliyun.com/repository/public'
+        }
+        maven {
+            credentials {
+                username aliyunUsername
+                password aliyunPassword
+            }
+            url 'https://packages.aliyun.com/maven/repository/2011994-release-s88vxq/'
+        }
+        maven {
+            credentials {
+                username aliyunUsername
+                password aliyunPassword
+            }
+            url 'https://packages.aliyun.com/maven/repository/2011994-snapshot-0nlegv/'
+        }
+    }
+}
+
+task increment << {
+
+    def bump = project.hasProperty("versionBump") ? project.property("versionBump") : "PATCH"
+    def v = buildFile.getText().find(version)
+    v = v.replace("-SNAPSHOT", "")
+    def (major, minor, patch) = v.tokenize('.')
+
+    if (bump == 'MAJOR') {
+        major = major.toInteger() + 1
+        minor = '0'
+        patch = '0'
+    } else if (bump == 'MINOR') {
+        minor = minor.toInteger() + 1
+        patch = '0'
+    } else {
+        patch = patch.toInteger() + 1
+    }
+    String nextVersion = String.join(".", major.toString(), minor.toString(), patch.toString())
+    String s = buildFile.getText().replaceFirst("version = '$version'", "version = '" + nextVersion + "'")
+
+    buildFile.setText(s)
+}
+
+task prepareSnapshot << {
+    def v = buildFile.getText().find(version)
+    v = v.replace("-SNAPSHOT", "") + "-SNAPSHOT"
+    String s = buildFile.getText().replaceFirst("version = '$version'", "version = '" + v + "'")
+    buildFile.setText(s)
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: 'https://packages.aliyun.com/maven/repository/2011994-release-s88vxq/') {
+                authentication(
+                        userName: aliyunUsername,
+                        password: aliyunPassword
+                )
+            }
+            snapshotRepository(url: 'https://packages.aliyun.com/maven/repository/2011994-snapshot-0nlegv/') {
+                authentication(
+                        userName: aliyunUsername,
+                        password: aliyunPassword
+                )
+            }
+            pom.version = project.version
+            pom.artifactId = artifactId
+            pom.groupId = project.group
+        }
+    }
 }
 
 dependencies {
     compile "com.google.guava:guava:${gradle.guavaVersion}"
     compile "io.vertx:vertx-unit:${gradle.vertxVersion}"
-
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
