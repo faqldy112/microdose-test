@@ -6,7 +6,9 @@ pipeline {
     stages {
         stage('build') {
             steps {
-                sh './gradlew clean build'
+                withCredentials([usernamePassword(credentialsId: 'aliyun_maven_repo', passwordVariable: 'password', usernameVariable: 'username')]) {
+                    sh './gradlew clean build -Pusername=$username -Ppassword=$password'
+                }
             }
         }
         stage('setVersion') {
