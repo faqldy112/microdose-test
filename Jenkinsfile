@@ -1,7 +1,7 @@
 pipeline {
     agent any
     parameters {
-            choice(choices: ['MAJOR', 'MINOR', 'PATCH'], name: 'VERSION_BUMP')
+            choice(choices: ['PATCH', 'MINOR', 'MAJOR'], name: 'VERSION_BUMP')
         }
     stages {
         stage('build') {
